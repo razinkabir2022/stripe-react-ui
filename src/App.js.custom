@@ -1,0 +1,57 @@
+import React, { useState } from "react";
+import StripeCheckout from "react-stripe-checkout";
+import axios from "axios";
+
+function App() {
+  const [email, setEmail] = useState("");
+  const [amount, setAmount] = useState(0);
+
+  async function handleToken(token) {
+    console.log(token);
+    await axios
+      .post("http://localhost:8080/api/payment/charge", {
+        token: token.id,
+        email: email,
+        amount: amount * 100, // Converting amount to cents
+      })
+      .then(() => {
+        alert("Payment Success");
+      })
+      .catch((error) => {
+        alert(error);
+      });
+  }
+
+  return (
+    <div className="App">
+      <label>
+        Email:
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+      </label>
+      <br />
+      <label>
+        Amount:
+        <input
+          type="number"
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
+          required
+        />
+      </label>
+      <br />
+      <StripeCheckout
+        stripeKey="pk_test_51P1yv3HAYSgpUy4mjpoYvnjysY2o9np3BIDw1BC1XFNYcWgLQ7ryuQb5KWLBGf3WRVpfmIhq8NG7msJ37dfXs7Ev00qRCOBtTf"
+        token={handleToken}
+        email={email}
+        amount={amount * 100} // Converting amount to cents
+      />
+    </div>
+  );
+}
+
+export default App;
